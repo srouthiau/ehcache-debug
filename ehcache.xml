@@ -1,0 +1,42 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="ehcache.xsd">
+
+	<diskStore path="java.io.tmpdir/qrcache" />
+	
+		<!-- ATTENTION : Un port de multicast différent par environnement (prod, recette, etc)... -->
+     <cacheManagerPeerProviderFactory
+        class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+        properties="peerDiscovery=automatic,
+                    multicastGroupAddress=231.0.0.2,
+                    multicastGroupPort=4450, timeToLive=1"
+        propertySeparator=","
+    />
+
+    <cacheManagerPeerListenerFactory
+        class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"
+        properties="socketTimeoutMillis=20000,port=10001"
+    />
+	
+		<defaultCache 
+	   maxElementsInMemory="1000" 
+	   eternal="false"
+	   timeToIdleSeconds="1800" 
+	   timeToLiveSeconds="1800" 
+	   overflowToDisk="false"
+	   memoryStoreEvictionPolicy="LRU" />
+	   
+	   <cache 
+	   name="qrcache.root" 
+	   maxElementsInMemory="10000"
+	   timeToLiveSeconds="14400" 
+	   timeToIdleSeconds="14400" 
+	   overflowToDisk="false"
+	   eternal="false" 
+	   memoryStoreEvictionPolicy="LRU">
+	           <cacheEventListenerFactory 
+            class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+            properties="replicateAsynchronously=true,asynchronousReplicationIntervalMillis=2000,
+                        replicatePuts=false,replicateRemovals=true,replicateUpdates=true, 
+                        replicateUpdatesViaCopy=false"/>
+	</cache>
+</ehcache>
